@@ -71,21 +71,22 @@
                         if (!isNaN(rowNumber) && rowNumber >= 0 && rowNumber <= 2) {
                             var colNumber = parseInt(prompt("Enter col number"));
                             if (!isNaN(colNumber) && colNumber >= 0 && colNumber <= 2) {
-                                if (this.board[rowNumber][colNumber] == ' ') {
-                                    this.makeMove(rowNumber, colNumber);
-                                }
-                                else alert("Cell is already filled with " + this.board[rowNumber][colNumber] + "!!");
+                                if (!this.makeMove(rowNumber, colNumber))
+                                    alert("Cell is already filled with " + this.board[rowNumber][colNumber] + "!!");
                             }
                             else alert("Give a number for col between 0 and 2!!");
                         }
                         else alert("Give a number for row between 0 and 2!!");
                     },
                     makeMove: function(row, col) {
-                        this.updateBoard(row, col, this.currentPlayerMark);
-                        this.whoseTurn = !this.whoseTurn;
-                        if (this.gameEnded) {
-                            alert(this.victor  + " wins!");
-                        }
+                        if (this.board[row][col] == ' ') {
+                            this.updateBoard(row, col, this.currentPlayerMark);
+                            this.whoseTurn = !this.whoseTurn;
+                            if (this.gameEnded) {
+                                alert(this.victor  + " wins!");
+                            }
+                            return true;
+                        } else return false;
                     },
                     updateBoard: function(row, col, value) {
                         var newRow = this.board[row].slice();
