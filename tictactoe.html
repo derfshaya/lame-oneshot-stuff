@@ -7,10 +7,18 @@
     </head>
     <body>
         <div id="app">
-            <pre>{{ boardDisplay }}</pre>
+            <table style="border: 1px solid black;" width="90px">
+                <tr v-for="(boardRow, row) in board" height="30px">
+                    <td v-for="(boardCell, col) in boardRow" width="30px" style="text-align:center">
+                        <button v-on:click.prevent="makeMove(row, col)" style="width:30px; height:30px; text-align:center">
+                            {{ displayCell(boardCell) }}
+                        </button>
+                    </td>
+                </tr>
+            </table>
             <p v-if="!gameEnded">Current Player: {{ currentPlayerMark }}</p>
             <p v-if="gameEnded">{{ victor }} won!</p>
-            <button v-on:click.prevent="makeMove" :disabled="gameEnded">Make Move</button>
+            <!--<button v-on:click.prevent="makeMovePrompt" :disabled="gameEnded">Make Move</button>-->
         </div>
 
         <script>
@@ -58,28 +66,34 @@
                     }
                 },
                 methods: {
-                    makeMove: function() {
+                    makeMovePrompt: function() {
                         var rowNumber = parseInt(prompt("Enter row number"));
                         if (!isNaN(rowNumber) && rowNumber >= 0 && rowNumber <= 2) {
                             var colNumber = parseInt(prompt("Enter col number"));
                             if (!isNaN(colNumber) && colNumber >= 0 && colNumber <= 2) {
                                 if (this.board[rowNumber][colNumber] == ' ') {
-                                    this.updateBoard(rowNumber, colNumber, this.currentPlayerMark);
-                                    this.whoseTurn = !this.whoseTurn;
-                                    if (this.gameEnded) {
-                                        alert(this.victor  + " wins!")
-                                    }
+                                    this.makeMove(rowNumber, colNumber);
                                 }
-                                else alert("Cell is already filled with " + this.board[rowNumber][colNumber] + "!!")
+                                else alert("Cell is already filled with " + this.board[rowNumber][colNumber] + "!!");
                             }
-                            else alert("Give a number for col between 0 and 2!!")
+                            else alert("Give a number for col between 0 and 2!!");
                         }
-                        else alert("Give a number for row between 0 and 2!!")
+                        else alert("Give a number for row between 0 and 2!!");
+                    },
+                    makeMove: function(row, col) {
+                        this.updateBoard(row, col, this.currentPlayerMark);
+                        this.whoseTurn = !this.whoseTurn;
+                        if (this.gameEnded) {
+                            alert(this.victor  + " wins!");
+                        }
                     },
                     updateBoard: function(row, col, value) {
                         var newRow = this.board[row].slice();
                         newRow[col] = value;
                         this.$set(this.board, row, newRow);
+                    },
+                    displayCell: function(cellValue) {
+                        return displayCell(cellValue);
                     }
                 }
             });
@@ -105,6 +119,12 @@
                 }
                 boardDisplayString += '   -------------'
                 return boardDisplayString;
+            }
+
+            function displayCell(cellValue) {
+                if (cellValue != ' ')
+                    return cellValue;
+                else return '\xa0';
             }
 
         </script>
