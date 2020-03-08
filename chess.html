@@ -1,0 +1,146 @@
+<html>
+    <head>
+        <title>Chess LOL</title>
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>-->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+    </head>
+    <body>
+        <div id="app">
+            <table style="border: 1px solid black;" cellpadding="0" cellspacing="0">
+                <tr v-for="(boardRow, row) in board">
+                    <td v-for="(boardCell, col) in boardRow" style="text-align:center">
+                        <button class="w3-button"
+                                v-bind:class="cellClass(row, col)"
+                                v-on:click.prevent="makeMove(row, col)"
+                                style="width:40px; height:40px; text-align:center;
+                                        font-size: 35px; padding: 0px;">
+                            {{ drawPiece(boardCell) }}
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <p v-if="!gameEnded">Current Player: {{ currentPlayerMark }}</p>
+            <p v-if="gameEnded">{{ victor }} won!</p>
+            <!--<button v-on:click.prevent="makeMovePrompt" :disabled="gameEnded">Make Move</button>-->
+        </div>
+
+        <script>
+            const pieceToCharacter = new Map([
+                ['p', '\u2659'],
+                ['P', '\u265f'],
+                ['r', '\u2656'],
+                ['R', '\u265c'],
+                ['n', '\u2658'],
+                ['N', '\u265e'],
+                ['b', '\u2657'],
+                ['B', '\u265d'],
+                ['q', '\u2655'],
+                ['Q', '\u265b'],
+                ['k', '\u2654'],
+                ['K', '\u265a']
+            ]);
+
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    board: [
+                        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
+                        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                        ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+                        ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']],
+                    whoseTurn: true,
+                    firstPlayer: true, // First Player is White
+                    selectedCell: { row: -1, col: -1 }
+                },
+                computed: {
+                    currentPlayerMark: function() {
+                        return 'Freestyle';
+                        // return (this.whoseTurn ? !this.firstPlayer : this.firstPlayer) ? 'Black' : 'White';
+                    },
+                    victor: function() {
+                        return ' ';
+                    },
+                    gameEnded: function() {
+                        return this.victor != ' ';
+                    }
+                },
+                methods: {
+                    drawPiece: function(piece) {
+                        return drawPiece(piece);
+                    },
+                    makeMove: function(row, col) {
+                        if (this.aCellIsSelected()) {
+                            if (!this.currentCellIsSelected()) {
+                                var selectedPiece = this.getPieceForCell(this.selectedCell.row, this.selectedCell.col);
+                                this.updateBoard(this.selectedCell.row, this.selectedCell.col, ' ');
+                                this.updateBoard(row, col, selectedPiece);
+                            }
+                            this.unselectCell();
+                        } else {
+                            if (this.getPieceForCell(row, col) != ' ') {
+                                this.selectCell(row, col);
+                            } else {
+                                return false;
+                            }
+                        }
+                        return true;
+                    },
+                    getPieceForCell: function(row, col) {
+                        if (row != -1 && col != -1) {
+                            return this.board[row][col];
+                        } else {
+                            return ' ';
+                        }
+                    },
+                    currentCellIsSelected: function(row, col) {
+                        return this.selectedCell.row == row && this.selectedCell.col == col;
+                    },
+                    aCellIsSelected: function() {
+                        return this.selectedCell.row != -1 && this.selectedCell.col != -1;
+                    },
+                    selectCell: function(row, col) {
+                        this.selectedCell = { row: row, col: col };
+                    },
+                    unselectCell: function() {
+                        this.selectCell(-1, -1);
+                    },
+                    cellClass: function(row, col) {
+                        var cellColor = this.cellColor(row, col)
+                        if (cellColor != 'green') {
+                            return 'w3-' + this.cellColor(row, col);
+                        } else {
+                            return 'w3-green w3-hover-teal';
+                        }
+                    },
+                    cellColor: function(row, col) {
+                        if (this.selectedCell.row != row || this.selectedCell.col != col) {
+                            var evenRow = row % 2 == 0;
+                            var evenCol = col % 2 == 0;
+                            return (evenCol ? evenRow : !evenRow) ? 'grey' : 'white';
+                        } else {
+                            return 'green';
+                        }
+                    },
+                    updateBoard: function(row, col, value) {
+                        var newRow = this.board[row].slice();
+                        newRow[col] = value;
+                        this.$set(this.board, row, newRow);
+                    },
+                    displayCell: function(cellValue) {
+                        return displayCell(cellValue);
+                    }
+                }
+            });
+
+            function drawPiece(piece) {
+                return pieceToCharacter.get(piece);
+            }
+        </script>
+    </body>
+</html>
